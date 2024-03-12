@@ -1,0 +1,85 @@
+* {
+	box-sizing: border-box;
+}
+
+:root {
+	--base: rgb(100, 100, 100);
+	--buttons: rgb(200, 200, 200);
+	--button-padding: 10px;
+	--gap: 5px;
+	--operators: rgb(255, 80, 0)
+}
+
+#container {
+	background: var(--base);
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	margin: 0 auto;
+	width: 300px;
+}
+
+.operators, .numbers, .last-row {
+	display: flex;
+	gap: var(--gap);
+	flex-wrap:wrap;
+}
+
+.screen {
+	background: rgb(10 10 10);
+	color: rgb(255 255 0);
+	padding: 10px;
+}
+
+.operators div, .numbers > div {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	text-align: center;	
+}
+
+.operators div:hover, .numbers div:hover {
+	cursor: pointer;
+	filter: brightness(59%);
+}
+
+.operators {
+	margin: var(--gap) 0;
+}
+
+.operators div {
+	background: var(--operators);
+	flex: 1 1 calc(25% - var(--gap));
+	padding: var(--button-padding) 0;
+}
+
+.numbers > div {
+	background: var(--buttons);
+	flex: 1 1 calc(33% - 3px);
+	padding: var(--button-padding) 0;
+}
+
+.last-row {
+	background: none!important;
+	flex-basis: auto!important;
+	padding: 0!important;
+	width: 100%;
+}
+
+.last-row:hover {
+	filter: none!important;
+}
+
+.last-row > div:first-of-type {
+	flex: 1 1 calc(33% - var(--gap));
+}
+
+.last-row > div:last-of-type {
+	background: var(--operators);
+	flex: 2 2 calc(66% - var(--gap));
+}
+
+.last-row > div {
+	background: var(--buttons);
+	padding: var(--button-padding) 0;
+}
