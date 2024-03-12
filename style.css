@@ -31,29 +31,29 @@
 	padding: 10px;
 }
 
-.operators div, .numbers > div {
+.operators button, .numbers > button {
 	align-items: center;
 	display: flex;
 	justify-content: center;
 	text-align: center;	
 }
 
-.operators div:hover, .numbers div:hover {
+.operators button:hover, .numbers button:hover {
 	cursor: pointer;
-	filter: brightness(59%);
+	filter: brightness(90%);
 }
 
 .operators {
 	margin: var(--gap) 0;
 }
 
-.operators div {
+.operators button {
 	background: var(--operators);
-	flex: 1 1 calc(25% - var(--gap));
+	flex: 1 1 calc(20% - var(--gap));
 	padding: var(--button-padding) 0;
 }
 
-.numbers > div {
+.numbers > button {
 	background: var(--buttons);
 	flex: 1 1 calc(33% - 3px);
 	padding: var(--button-padding) 0;
@@ -70,16 +70,16 @@
 	filter: none!important;
 }
 
-.last-row > div:first-of-type {
+.last-row > button:first-of-type {
 	flex: 1 1 calc(33% - var(--gap));
 }
 
-.last-row > div:last-of-type {
+.last-row > button:last-of-type {
 	background: var(--operators);
 	flex: 2 2 calc(66% - var(--gap));
 }
 
-.last-row > div {
+.last-row > button {
 	background: var(--buttons);
 	padding: var(--button-padding) 0;
 }
