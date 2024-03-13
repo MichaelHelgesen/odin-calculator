@@ -33,14 +33,25 @@ var operate = function (operator, num1, num2) {
     }
 };
 var saveValue = function (value) {
+    // Check if there has been input
     if (!firstNum) {
-        firstNum = value;
-        inputString = value;
+        // Check if first input is a number, and not 0 or an operator
+        if (value != "0" && Number(value)) {
+            firstNum = value;
+            lastNum = value;
+            inputString = value;
+        }
+        // Return if user tries to enter several operators in a row
+    }
+    else if (!Number(lastNum) && (value != "0" && !Number(value))) {
+        return;
     }
     else {
         inputString += value;
+        lastNum = value;
     }
     screenEl.textContent = inputString;
+    console.log(inputString);
 };
 var clearValues = function () {
     inputString = "0";

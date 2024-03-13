@@ -1,5 +1,5 @@
 let firstNum: string = null;
-let lastNum: number = null;
+let lastNum: string= null;
 let operator: string = null;
 let inputString: string = "0";
 const screenEl: HTMLElement = document.querySelector(".screen");
@@ -31,13 +31,23 @@ const operate = function(operator: string, num1: number, num2: number): number {
 }
 
 const saveValue = function(value: string): void {
+	// Check if there has been input
 	if(!firstNum) {
-		firstNum = value;
-		inputString = value;
+		// Check if first input is a number, and not 0 or an operator
+		if (value != "0" && Number(value)) {
+			firstNum = value;
+			lastNum = value;
+			inputString = value;
+		}
+	// Return if user tries to enter several operators in a row
+	} else if (!Number(lastNum) && (value != "0" && !Number(value) ) {
+		return;
 	} else {
 		inputString += value;
+		lastNum = value;
 	}
 	screenEl.textContent = inputString;
+	console.log(inputString);
 }
 
 const clearValues = function(): void {
