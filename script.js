@@ -1,7 +1,9 @@
 var firstNum = null;
 var lastNum = null;
 var operator = null;
+var initialized = false;
 var inputString = "0";
+var totalSum = 0;
 var screenEl = document.querySelector(".screen");
 var buttons = document.querySelectorAll("button");
 var add = function (num1, num2) {
@@ -34,29 +36,74 @@ var operate = function (operator, num1, num2) {
 };
 var saveValue = function (value) {
     // Check if there has been input
-    if (!firstNum) {
+    if (!initialized) {
         // Check if first input is a number, and not 0 or an operator
         if (value != "0" && Number(value)) {
             firstNum = value;
-            lastNum = value;
             inputString = value;
+            initialized = true;
+            screenEl.textContent = inputString;
+            console.log("if", 1);
+            return;
         }
-        // Return if user tries to enter several operators in a row
+        else {
+            firstNum = "0";
+            inputString = "0";
+            initialized = true;
+            screenEl.textContent = inputString;
+            console.log("if", "1-1");
+            return;
+        }
     }
-    else if (!Number(lastNum) && (value != "0" && !Number(value))) {
-        return;
+    if ((Number(value) || value == "0") && !operator && !lastNum) {
+        if (value == "0" && firstNum == "0") {
+            console.log("if", "2-1");
+            return;
+        }
+        else if (Number(value) && firstNum == "0") {
+            firstNum = value;
+            inputString = value;
+            screenEl.textContent = inputString;
+            console.log("if", "2-2");
+            return;
+        }
+        else {
+            firstNum += value;
+            inputString += value;
+            screenEl.textContent = inputString;
+            console.log("if", "2-3");
+            return;
+        }
+        console.log("if", 2);
     }
-    else {
+    if (!Number(value) && !operator && value != "0") {
+        operator = value;
         inputString += value;
-        lastNum = value;
+        console.log("if", 3);
+    }
+    if ((Number(value) || value == "0") && operator) {
+        lastNum ? lastNum += value : lastNum = value;
+        inputString += value;
+        console.log("if", 4);
+    }
+    if ((!Number(value) && value != "0") && firstNum && lastNum) {
+        console.log(operate(operator, Number(firstNum), Number(lastNum)));
+        totalSum = operate(operator, Number(firstNum), Number(lastNum));
+        firstNum = totalSum.toString();
+        lastNum = "";
+        operator = value;
+        inputString += value;
+        console.log("if", 5);
+        console.log("sum", totalSum);
     }
     screenEl.textContent = inputString;
-    console.log(inputString);
 };
 var clearValues = function () {
     inputString = "0";
-    firstNum = null;
+    firstNum = "";
+    lastNum = "";
     screenEl.textContent = inputString;
+    initialized = false;
 };
 var registerInput = function (input) {
     switch (input.target.textContent) {
@@ -73,5 +120,14 @@ var registerInput = function (input) {
 };
 var sum = function () {
     console.log("sum");
+    if (!lastNum) {
+        return;
+    }
+    totalSum = operate(operator, Number(firstNum), Number(lastNum));
+    firstNum = "";
+    lastNum = "";
+    operator = "";
+    screenEl.textContent = totalSum.toString();
+    initialized: false;
 };
 buttons.forEach((function (btn) { return (btn).addEventListener("click", function (e) { return registerInput(e); }); }));

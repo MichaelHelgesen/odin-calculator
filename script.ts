@@ -1,7 +1,9 @@
 let firstNum: string = null;
 let lastNum: string= null;
 let operator: string = null;
+let initialized: boolean = false;
 let inputString: string = "0";
+let totalSum: number = 0;
 const screenEl: HTMLElement = document.querySelector(".screen");
 const buttons = document.querySelectorAll("button");
 
@@ -32,28 +34,72 @@ const operate = function(operator: string, num1: number, num2: number): number {
 
 const saveValue = function(value: string): void {
 	// Check if there has been input
-	if(!firstNum) {
+	if(!initialized) {
 		// Check if first input is a number, and not 0 or an operator
-		if (value != "0" && Number(value)) {
-			firstNum = value;
-			lastNum = value;
+		if (value != "0" && Number(value)) { 
+			firstNum = value; 
 			inputString = value;
+			initialized = true;
+			screenEl.textContent = inputString;
+			console.log("if", 1)
+			return;
+		} else {
+			firstNum = "0";
+			inputString = "0";
+			initialized = true;
+			screenEl.textContent = inputString;
+			console.log("if", "1-1");
+			return;
 		}
-	// Return if user tries to enter several operators in a row
-	} else if (!Number(lastNum) && (value != "0" && !Number(value) ) {
-		return;
-	} else {
+	}
+	if((Number(value) || value == "0") && !operator && !lastNum){
+		if(value == "0" && firstNum == "0") {
+			console.log("if", "2-1")
+			return;
+		} else if (Number(value) && firstNum == "0"){
+			firstNum = value;
+			inputString = value;
+			screenEl.textContent = inputString;
+			console.log("if", "2-2");
+			return;
+		} else {
+			firstNum += value;
+			inputString += value;
+			screenEl.textContent = inputString;
+			console.log("if", "2-3");
+			return;
+		}
+		console.log("if", 2)
+	}
+	if(!Number(value) && !operator && value != "0") {
+		operator = value;
 		inputString += value;
-		lastNum = value;
+		console.log("if", 3)
+	}
+	if((Number(value) || value == "0") && operator) {
+		lastNum ? lastNum += value : lastNum = value;
+		inputString += value;
+		console.log("if", 4)
+	}
+	if((!Number(value) && value != "0") && firstNum && lastNum) {
+		console.log(operate(operator, Number(firstNum), Number(lastNum)));
+		totalSum = operate(operator, Number(firstNum), Number(lastNum));
+		firstNum = totalSum.toString();
+		lastNum = "";
+		operator = value;
+		inputString += value;	
+		console.log("if", 5)
+		console.log("sum", totalSum);
 	}
 	screenEl.textContent = inputString;
-	console.log(inputString);
 }
 
 const clearValues = function(): void {
 	inputString = "0";
-	firstNum = null;
+	firstNum = "";
+	lastNum = "";
 	screenEl.textContent = inputString;
+	initialized = false;
 }
 
 const registerInput = function (input): void {
@@ -69,6 +115,15 @@ const registerInput = function (input): void {
 
 const sum = function(): void {
 	console.log("sum");
+	if(!lastNum) {
+		return;
+	}
+	totalSum = operate(operator, Number(firstNum), Number(lastNum));
+	firstNum = "";
+	lastNum = "";
+	operator = "";
+	screenEl.textContent = totalSum.toString()
+	initialized: false;	
 }
 
 buttons.forEach((btn => (btn).addEventListener("click", (e) => registerInput(e) )));
