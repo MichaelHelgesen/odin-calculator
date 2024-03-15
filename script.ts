@@ -1,12 +1,11 @@
-let firstNum: string = null;
-let lastNum: string= null;
+let leftSide: number[] = [];
+let rightSide: number[] = [];
 let operator: string = null;
 let initialized: boolean = false;
 let inputString: string = "0";
-let totalSum: number = 0;
 const screenEl: HTMLElement = document.querySelector(".screen");
 const buttons = document.querySelectorAll("button");
-
+let totalSum = null;
 const add = function(num1: number, num2: number): number {
 	return num1 + num2;
 };
@@ -33,87 +32,76 @@ const operate = function(operator: string, num1: number, num2: number): number {
 }
 
 const saveValue = function(value: string): void {
-	// Check if there has been input
-	if(!initialized) {
-		// Check if first input is a number, and not 0 or an operator
-		if(!firstNum) {
-			if (value != "0" && Number(value)) { 
-				firstNum = value; 
-				inputString = value;
-				initialized = true;
-				screenEl.textContent = inputString;
-				console.log("if", 1)
-				return;
-			} else {
-				firstNum = "0";
-				inputString = "0";
-				initialized = true;
-				screenEl.textContent = inputString;
-				console.log("if", "1-1");
+	const valueType = Number(value);
+
+	// Check to see if value is number or operator.
+	if(!Number(valueType) && value != "0") {
+		console.log("operator");
+		// Check if continuing calculations after pressing equals button
+		if (totalSum) {
+			console.log("totalSum", totalSum);
+			leftSide = [totalSum];
+			totalSum = null;
+		}
+		// Do calculation if left side and right side of operator has value. 
+		if (leftSide.length && rightSide.length) {
+			console.log("beggge tall lengde");
+			if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
+				screenEl.textContent = "ERROR";
+				leftSide = [];
+				rightSide = [];
+				operator = "";
 				return;
 			}
+			leftSide = [Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))))]
+			rightSide = [];
+			screenEl.textContent = leftSide.toString() + value;
+			operator = value;
+			return;
+		// Set operator if only left side is set.
+		} else if (leftSide.length) {
+			console.log("kun vestre tall og operator")
+			operator = value;
+			screenEl.textContent = leftSide.join("") + operator;
+			return;
+		// Set operator and left side value if starting with operator.
 		} else {
-			if(value === "0" || Number(value)) {
-				initialized = false;
-				firstNum = "";
-				console.log("if", "1-2")
-				return saveValue(value);
-			} else {
-				console.log("if", "1-2-1");
-				initialized = true;
-				return saveValue(value);
-			}
+			leftSide = [0]
+			operator = value;
+			screenEl.textContent = leftSide.join("") + operator;
+			return;
 		}
 	}
-	if((Number(value) || value == "0") && !operator && !lastNum){
-		if(value == "0" && firstNum == "0") {
-			console.log("if", "2-1")
-			return;
-		} else if (Number(value) && firstNum == "0"){
-			firstNum = value;
-			inputString = value;
-			screenEl.textContent = inputString;
-			console.log("if", "2-2");
-			return;
-		} else {
-			firstNum += value;
-			inputString += value;
-			screenEl.textContent = inputString;
-			console.log("if", "2-3");
+	// Set left side as first value.
+	if(!operator){
+		console.log("add to left");
+		// Return if repeting zero as first number.
+		if(valueType === 0 && leftSide[0] === 0) {
+			console.log("Zeros")
 			return;
 		}
-		console.log("if", 2)
+		// Stop trailing zeros
+		if (leftSide[0] === 0) {
+			leftSide = [];
+		}	
+		console.log("push left");
+		leftSide.push(valueType);
+		screenEl.textContent = leftSide.join("");
+		totalSum = null;
+		// Set right side.
+	} else {
+		console.log("add to right");
+		rightSide.push(valueType);
+		screenEl.textContent = leftSide.join("").toString() + operator + rightSide.join("").toString();
 	}
-	if(!Number(value) && !operator && value != "0") {
-		operator = value;
-		inputString += value;
-		console.log("if", 3)
-	}
-	if((Number(value) || value == "0") && operator) {
-		lastNum ? lastNum += value : lastNum = value;
-		inputString += value;
-		console.log("if", 4)
-	}
-	if((!Number(value) && value != "0") && firstNum && lastNum) {
-		console.log(operate(operator, Number(firstNum), Number(lastNum)));
-		totalSum = operate(operator, Number(firstNum), Number(lastNum));
-		firstNum = totalSum.toString();
-		lastNum = "";
-		operator = value;
-		inputString += value;	
-		console.log("if", 5)
-		console.log("sum", totalSum);
-	}
-	screenEl.textContent = inputString;
 }
 
 const clearValues = function(): void {
-	inputString = "0";
-	firstNum = "";
-	lastNum = "";
+	totalSum = null;
+	leftSide =[];
+	rightSide = [];
 	operator = "";
-	screenEl.textContent = inputString;
-	initialized = false;
+	screenEl.textContent = "0";
 }
 
 const registerInput = function (input): void {
@@ -129,16 +117,21 @@ const registerInput = function (input): void {
 
 const sum = function(): void {
 	console.log("sum");
-	if(!lastNum) {
+	if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
+		screenEl.textContent = "ERROR";
+		leftSide = [];
+		rightSide = [];
+		operator = "";
 		return;
 	}
-	totalSum = operate(operator, Number(firstNum), Number(lastNum));
-	firstNum = totalSum.toString();
-	lastNum = "";
-	operator = "";
-	initialized = false;
-	inputString = totalSum.toString();
-	screenEl.textContent = totalSum.toString()
+	if(leftSide.length && rightSide.length && operator) {
+		totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
+		screenEl.textContent = totalSum.toString();
+		leftSide = [];
+		rightSide = [];
+		operator = "";
+		//saveValue(totalSum.toString());
+	}
 }
 
 buttons.forEach((btn => (btn).addEventListener("click", (e) => registerInput(e) )));
