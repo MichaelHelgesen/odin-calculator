@@ -49,7 +49,7 @@
 
 .operators button {
 	background: var(--operators);
-	flex: 1 1 calc(20% - var(--gap));
+	flex: 1 1 calc(14.3% - var(--gap));
 	padding: var(--button-padding) 0;
 }
 
