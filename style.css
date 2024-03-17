@@ -4,82 +4,108 @@
 
 :root {
 	--base: rgb(100, 100, 100);
-	--buttons: rgb(200, 200, 200);
+	--border-radius: 3px;
+	--buttons: rgb(123 106 106);
 	--button-padding: 10px;
 	--gap: 5px;
-	--operators: rgb(255, 80, 0)
+	--operators: rgb(242, 225, 24)
+}
+
+body {
+	align-items: center;
+	display: flex;
+	height: 100vh;
+	justify-content:center;
 }
 
 #container {
 	background: var(--base);
-	padding: 10px;
+	border-radius: 7px;
 	display: flex;
 	flex-direction: column;
 	margin: 0 auto;
-	width: 300px;
+	padding: 10px;
+	width: 250px;
 }
 
-.operators, .numbers, .last-row {
+.buttons {
 	display: flex;
+	flex-direction: column;
 	gap: var(--gap);
-	flex-wrap:wrap;
+	margin-top: var(--gap);
+}
+
+.screens {
+	overflow: hidden;
+	position: relative;
+}
+
+.screen-back {
+	color: rgb(255 255 0);
+	font-size: 20px;
+	left: 0;
+	padding: var(--gap) 10px;
+	position: absolute;
+	top: 0;
 }
 
 .screen {
-	background: rgb(10 10 10);
+	background: rgba(10, 10, 10, .8);
 	color: rgb(255 255 0);
-	padding: 10px;
+	font-size: 20px;
+	padding: var(--gap) 10px;
+	position: relative;
+	z-index: 11;
 }
 
-.operators button, .numbers > button {
-	align-items: center;
+.operators, .numbers, .sum {
 	display: flex;
-	justify-content: center;
-	text-align: center;	
-}
-
-.operators button:hover, .numbers button:hover {
-	cursor: pointer;
-	filter: brightness(90%);
+	flex-wrap:wrap;
+	gap: var(--gap);
 }
 
 .operators {
-	margin: var(--gap) 0;
+	flex: 1;
+	flex-direction: row;
 }
 
 .operators button {
 	background: var(--operators);
-	flex: 1 1 calc(14.3% - var(--gap));
+	border-radius: var(--border-radius);
+	flex: 1;
 	padding: var(--button-padding) 0;
+}
+
+.operators button:hover, .numbers button:hover, .sum button:hover {
+	cursor: pointer;
+	filter: brightness(90%);
+}
+
+.numbers-sum {
+	display: flex;
+	flex-direction: row;
+	gap: var(--gap);
+}
+
+.numbers {
+	flex: 1 1 calc(80% - 1.5px);
 }
 
 .numbers > button {
 	background: var(--buttons);
+	border-radius: var(--border-radius);
+	color: white;
 	flex: 1 1 calc(33% - 3px);
 	padding: var(--button-padding) 0;
 }
 
-.last-row {
-	background: none!important;
-	flex-basis: auto!important;
-	padding: 0!important;
-	width: 100%;
+.sum {
+	flex: 1 1 calc(20% - 4.5px);
+	flex-direction: column;
 }
 
-.last-row:hover {
-	filter: none!important;
-}
-
-.last-row > button:first-of-type {
-	flex: 1 1 calc(33% - var(--gap));
-}
-
-.last-row > button:last-of-type {
-	background: var(--operators);
-	flex: 2 2 calc(66% - var(--gap));
-}
-
-.last-row > button {
-	background: var(--buttons);
-	padding: var(--button-padding) 0;
+.sum button {
+	background-color: var(--operators);
+	border-radius: var(--border-radius);
+	flex: 1;
 }
