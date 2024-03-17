@@ -4,7 +4,6 @@ let operator: string = null;
 let inputString: string = "0";
 const screenEl: HTMLElement = document.querySelector(".screen");
 const buttons = document.querySelectorAll("button");
-let totalSum = null;
 const floatButton: HTMLButtonElement = document.querySelector(".float");
 
 const add = function(num1: number, num2: number): number {
@@ -44,41 +43,34 @@ const saveValue = function(value: string): void {
 		// Enable dot for floating numbers
 		floatButton.disabled = false;
 		
-		// Check if user operates on sum after pressing equals button
-		if (totalSum) {
-			leftSide = [...totalSum.toString().split("")];
-			totalSum = null;
-		}
 		// Do calculation if left side and right side of operator has value. 
 		if (leftSide.length && rightSide.length) {
 
 			// Check for 0/0
 			if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
-				screenEl.textContent = "ERROR";
-				leftSide = [];
-				rightSide = [];
-				operator = "";
+				clearValues();
+				updateScreen("ERROR");
 				return;
 			}
 			
 			// Do the calculation and set the new value in leftSide and display the result
 			leftSide = [Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))))]
 			rightSide = [];
-			screenEl.textContent = leftSide.toString() + value;
+			updateScreen(leftSide.toString() + value);
 			operator = value;
 			return;
 
 		// Set operator if only left side is set.
 		} else if (leftSide.length) {
 			operator = value;
-			screenEl.textContent = leftSide.join("") + operator;
+			updateScreen(leftSide.join("") + operator);
 			return;
 		
 		// Set operator and left side value to zero if starting with operator.
 		} else {
 			leftSide = [0]
 			operator = value;
-			screenEl.textContent = leftSide.join("") + operator;
+			updateScreen(leftSide.join("") + operator);
 			return;
 		}
 	}
@@ -105,13 +97,10 @@ const saveValue = function(value: string): void {
 
 		// Push values to leftSide variable
 		leftSide.push(valueType);
-		if(valueType === ".") {
-			floatButton.disabled = true;
-		}
+		togglePointButton(leftSide);
 
 		// Update output and reset totalsum
-		screenEl.textContent = leftSide.join("");
-		totalSum = null;
+		updateScreen(leftSide.join(""));
 
 	} else { // Set right side.
 		
@@ -123,33 +112,32 @@ const saveValue = function(value: string): void {
 
 		// Stop trailing zeros
 		if(valueType === 0 && rightSide[0] === 0 && rightSide[1] != ".") {
+			console.log("trailing zero")
 			return;
 		}
 
 		// Remove zero as first value if not floating number to avoid trailing zeros before numbers
 		if(rightSide.length === 1 && rightSide[0] === 0 && Number(valueType)){
+			console.log("trtrtr")
 			rightSide = [];
 		}
 
 		// Push values to rightSide variable
 		rightSide.push(valueType);
-		if(valueType === ".") {
-			floatButton.disabled = true;
-		}
+		togglePointButton(rightSide);	
 
 		// Update output
-		screenEl.textContent = leftSide.join("").toString() + operator + rightSide.join("").toString();
+		updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
 	}
 }
 
 // Reset calculator 	
 const clearValues = function(): void {
-	totalSum = null;
 	leftSide =[];
 	rightSide = [];
 	operator = "";
 	floatButton.disabled = false;
-	screenEl.textContent = "0";
+	updateScreen("0");
 }
 
 // Register input
@@ -168,46 +156,42 @@ const registerInput = function (input): void {
 
 // Delete function for backspace button
 const deleteFunc = function(): void {
-	console.log("test")
+	
 	// Delete on the left side
-	if(!operator && !rightSide.length){
+	if(!operator && !rightSide.length && leftSide.length){
 
-		// If no numbers left, set zero
-		if(leftSide.length === 1){	
-			console.log("ttest2")
-			leftSide = [0];
-		} else if (!leftSide.length) {
-			console.log("test");
-			leftSide = [0];
-		} else {	
-			leftSide.pop();
-
-			// Disable dot if floating number
-			if(leftSide.filter(el => el === ".").length){
-				floatButton.disabled = true;
-			}
-		}
-		if(!leftSide.filter(el => el === ".").length){
-			floatButton.disabled = false;
-		}
-		screenEl.textContent = leftSide.join("").toString();
+		// If no numbers left, set zero else pop
+		leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
+		togglePointButton(leftSide);
+		updateScreen(leftSide.join("").toString());
+	
 		// Delete from the right side
 	} else if (operator && rightSide.length){
 		rightSide.pop();
-		
-		if(!rightSide.filter(el => el === ".").length){
-			floatButton.disabled = false;
-		}
-		
-		screenEl.textContent = leftSide.join("").toString() + operator + rightSide.join("").toString();
-	 } else {
+		togglePointButton(rightSide);	
+		updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
+
 		// Delete operator
+	 } else {
 	 	operator = "";
-		screenEl.textContent = leftSide.join("").toString();
-		if(leftSide.filter(el => el === ".").length){
-				floatButton.disabled = true;
-		}
+		updateScreen(leftSide.join("").toString());
+		togglePointButton(leftSide);	
 	 }
+}
+
+const reset = function(): void {
+	leftSide = [];
+	rightSide = [];
+	operator = "";
+	floatButton.disabled = false;
+}
+
+const updateScreen = function(value: any): void {
+	screenEl.textContent = value;
+}
+
+const togglePointButton = function(array: string[]): void {
+	array.filter(el => el === ".").length ? floatButton.disabled = true : floatButton.disabled = false;
 }
 
 // Do a calculation when pressing equals button
@@ -215,22 +199,18 @@ const sum = function(): void {
 	
 	// If 0/0 - reset
 	if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
-		screenEl.textContent = "ERROR";
-		leftSide = [];
-		rightSide = [];
-		operator = "";
-		floatButton.disabled = false;
+		updateScreen("ERROR");
+		reset();
 		return;
 	}
 	
 	// Calculate
 	if(leftSide.length && rightSide.length && operator) {
-		totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
-		screenEl.textContent = totalSum.toString();
+		const totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
+		updateScreen(totalSum.toString());
+		reset();
 		leftSide = [...totalSum.toString().split("")];
-		rightSide = [];
-		operator = "";
-		floatButton.disabled = false;
+		togglePointButton(leftSide);
 	}
 }
 
@@ -241,7 +221,7 @@ window.addEventListener("keydown", function(e){
 		registerInput(e.key.toString())
 	} else if (e.key === "," || e.key === ".") {
 		registerInput(".");
-	} else if (e.key === "/" || e.key === "*" || e.key === "-" || e.key === "+" || e.key === "," || e.key === ".") {
+	} else if (e.key === "/" || e.key === "*" || e.key === "-" || e.key === "+") {
 		registerInput(e.key)
 	} else if (e.keyCode === 13) {
 		registerInput("=")
@@ -251,7 +231,3 @@ window.addEventListener("keydown", function(e){
 		clearValues();
 	}		
 });
-
-
-
-
