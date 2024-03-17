@@ -1,3 +1,12 @@
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var leftSide = [];
 var rightSide = [];
 var operator = null;
@@ -34,7 +43,7 @@ var operate = function (operator, num1, num2) {
             break;
     }
 };
-// Save entered value and to operations based on the calculators current status
+// Save entered value and do operations based on the calculators current status
 var saveValue = function (value) {
     // Determine if the value is a number or a dot
     var valueType = value === "." ? value : Number(value);
@@ -44,7 +53,7 @@ var saveValue = function (value) {
         floatButton.disabled = false;
         // Check if user operates on sum after pressing equals button
         if (totalSum) {
-            leftSide = [totalSum];
+            leftSide = __spreadArray([], totalSum.toString().split(""), true);
             totalSum = null;
         }
         // Do calculation if left side and right side of operator has value. 
@@ -154,13 +163,16 @@ var registerInput = function (input) {
 };
 // Delete function for backspace button
 var deleteFunc = function () {
+    console.log("test");
     // Delete on the left side
     if (!operator && !rightSide.length) {
         // If no numbers left, set zero
         if (leftSide.length === 1) {
+            console.log("ttest2");
             leftSide = [0];
         }
         else if (!leftSide.length) {
+            console.log("test");
             leftSide = [0];
         }
         else {
@@ -207,7 +219,7 @@ var sum = function () {
     if (leftSide.length && rightSide.length && operator) {
         totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
         screenEl.textContent = totalSum.toString();
-        leftSide = [];
+        leftSide = __spreadArray([], totalSum.toString().split(""), true);
         rightSide = [];
         operator = "";
         floatButton.disabled = false;

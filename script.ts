@@ -32,7 +32,7 @@ const operate = function(operator: string, num1: number, num2: number): number {
 	}
 }
 
-// Save entered value and to operations based on the calculators current status
+// Save entered value and do operations based on the calculators current status
 const saveValue = function(value: string): void {
 
 	// Determine if the value is a number or a dot
@@ -46,7 +46,7 @@ const saveValue = function(value: string): void {
 		
 		// Check if user operates on sum after pressing equals button
 		if (totalSum) {
-			leftSide = [totalSum];
+			leftSide = [...totalSum.toString().split("")];
 			totalSum = null;
 		}
 		// Do calculation if left side and right side of operator has value. 
@@ -168,14 +168,16 @@ const registerInput = function (input): void {
 
 // Delete function for backspace button
 const deleteFunc = function(): void {
-
+	console.log("test")
 	// Delete on the left side
 	if(!operator && !rightSide.length){
 
 		// If no numbers left, set zero
 		if(leftSide.length === 1){	
+			console.log("ttest2")
 			leftSide = [0];
 		} else if (!leftSide.length) {
+			console.log("test");
 			leftSide = [0];
 		} else {	
 			leftSide.pop();
@@ -225,7 +227,7 @@ const sum = function(): void {
 	if(leftSide.length && rightSide.length && operator) {
 		totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
 		screenEl.textContent = totalSum.toString();
-		leftSide = [];
+		leftSide = [...totalSum.toString().split("")];
 		rightSide = [];
 		operator = "";
 		floatButton.disabled = false;
