@@ -6,8 +6,9 @@
 	--base: rgb(100, 100, 100);
 	--border-radius: 3px;
 	--buttons: rgb(123 106 106);
-	--button-padding: 10px;
-	--gap: 5px;
+	--button-padding: 20px;
+	--font-size: 20px;
+	--gap: 8px;
 	--operators: rgb(242, 225, 24)
 }
 
@@ -24,8 +25,8 @@ body {
 	display: flex;
 	flex-direction: column;
 	margin: 0 auto;
-	padding: 10px;
-	width: 250px;
+	padding: 16px;
+	width: 400px;
 }
 
 .buttons {
@@ -42,7 +43,7 @@ body {
 
 .screen-back {
 	color: rgb(255 255 0);
-	font-size: 20px;
+	font-size: 40px;
 	left: 0;
 	padding: var(--gap) 10px;
 	position: absolute;
@@ -52,7 +53,7 @@ body {
 .screen {
 	background: rgba(10, 10, 10, .8);
 	color: rgb(255 255 0);
-	font-size: 20px;
+	font-size: 40px;
 	padding: var(--gap) 10px;
 	position: relative;
 	z-index: 11;
@@ -73,6 +74,7 @@ body {
 	background: var(--operators);
 	border-radius: var(--border-radius);
 	flex: 1;
+	font-size: var(--font-size);
 	padding: var(--button-padding) 0;
 }
 
@@ -88,19 +90,20 @@ body {
 }
 
 .numbers {
-	flex: 1 1 calc(80% - 1.5px);
+	flex: 1 1 calc(80% - 8px);
 }
 
 .numbers > button {
 	background: var(--buttons);
 	border-radius: var(--border-radius);
 	color: white;
-	flex: 1 1 calc(33% - 3px);
+	flex: 1 1 calc(33% - 8px);
+	font-size: var(--font-size);
 	padding: var(--button-padding) 0;
 }
 
 .sum {
-	flex: 1 1 calc(20% - 4.5px);
+	flex: 1 1 calc(20% - 12px);
 	flex-direction: column;
 }
 
@@ -108,4 +111,5 @@ body {
 	background-color: var(--operators);
 	border-radius: var(--border-radius);
 	flex: 1;
+	font-size: var(--font-size);
 }
