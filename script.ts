@@ -33,16 +33,13 @@ const operate = function(operator: string, num1: number, num2: number): number {
 
 // Save entered value and do operations based on the calculators current status
 const saveValue = function(value: string): void {
-
+	
 	// Determine if the value is a number or a dot
 	const valueType = value === "." ? value : Number(value);
 
 	// Check to see if value is an operator
 	if(!Number(valueType) && value != "0" && value != ".") {
 
-		// Enable dot for floating numbers
-		floatButton.disabled = false;
-		
 		// Do calculation if left side and right side of operator has value. 
 		if (leftSide.length && rightSide.length) {
 
@@ -62,6 +59,11 @@ const saveValue = function(value: string): void {
 
 		// Set operator if only left side is set.
 		} else if (leftSide.length) {
+
+			//Insert zero at the end if dot followed by operator
+			if(leftSide[leftSide.length - 1] === ".") {
+				leftSide.push("0");
+			}
 			operator = value;
 			updateScreen(leftSide.join("") + operator);
 			return;
@@ -90,7 +92,7 @@ const saveValue = function(value: string): void {
 			floatButton.disabled = true;
 		}
 		
-		// Stop trailing zeros.
+		// If starting with zero and continue with number without dot, replace dot with number.
 		if(leftSide.length === 1 && leftSide[0] === 0 && Number(valueType)){
 			leftSide = [];
 		}
@@ -112,13 +114,11 @@ const saveValue = function(value: string): void {
 
 		// Stop trailing zeros
 		if(valueType === 0 && rightSide[0] === 0 && rightSide[1] != ".") {
-			console.log("trailing zero")
 			return;
 		}
 
 		// Remove zero as first value if not floating number to avoid trailing zeros before numbers
 		if(rightSide.length === 1 && rightSide[0] === 0 && Number(valueType)){
-			console.log("trtrtr")
 			rightSide = [];
 		}
 
@@ -158,20 +158,24 @@ const registerInput = function (input): void {
 const deleteFunc = function(): void {
 	
 	// Delete on the left side
-	if(!operator && !rightSide.length && leftSide.length){
+	if(!operator && !rightSide.length){
+		
+		if(!leftSide.length) {
+			return;
+		}	
 
 		// If no numbers left, set zero else pop
 		leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
 		togglePointButton(leftSide);
 		updateScreen(leftSide.join("").toString());
-	
-		// Delete from the right side
+
+	// Delete from the right side
 	} else if (operator && rightSide.length){
 		rightSide.pop();
 		togglePointButton(rightSide);	
 		updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
 
-		// Delete operator
+	// Delete operator
 	 } else {
 	 	operator = "";
 		updateScreen(leftSide.join("").toString());
@@ -218,9 +222,9 @@ buttons.forEach((btn => (btn).addEventListener("click", (e) => registerInput((e.
 
 window.addEventListener("keydown", function(e){
 	if((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105)) {
-		registerInput(e.key.toString())
+		Number(e.key) || e.key === "0" ? registerInput(e.key.toString()) : null;
 	} else if (e.key === "," || e.key === ".") {
-		registerInput(".");
+		if (!floatButton.disabled) {registerInput(".")};
 	} else if (e.key === "/" || e.key === "*" || e.key === "-" || e.key === "+") {
 		registerInput(e.key)
 	} else if (e.keyCode === 13) {

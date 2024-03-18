@@ -48,8 +48,6 @@ var saveValue = function (value) {
     var valueType = value === "." ? value : Number(value);
     // Check to see if value is an operator
     if (!Number(valueType) && value != "0" && value != ".") {
-        // Enable dot for floating numbers
-        floatButton.disabled = false;
         // Do calculation if left side and right side of operator has value. 
         if (leftSide.length && rightSide.length) {
             // Check for 0/0
@@ -67,6 +65,10 @@ var saveValue = function (value) {
             // Set operator if only left side is set.
         }
         else if (leftSide.length) {
+            //Insert zero at the end if dot followed by operator
+            if (leftSide[leftSide.length - 1] === ".") {
+                leftSide.push("0");
+            }
             operator = value;
             updateScreen(leftSide.join("") + operator);
             return;
@@ -91,7 +93,7 @@ var saveValue = function (value) {
             leftSide.push(0);
             floatButton.disabled = true;
         }
-        // Stop trailing zeros.
+        // If starting with zero and continue with number without dot, replace dot with number.
         if (leftSide.length === 1 && leftSide[0] === 0 && Number(valueType)) {
             leftSide = [];
         }
@@ -109,12 +111,10 @@ var saveValue = function (value) {
         }
         // Stop trailing zeros
         if (valueType === 0 && rightSide[0] === 0 && rightSide[1] != ".") {
-            console.log("trailing zero");
             return;
         }
         // Remove zero as first value if not floating number to avoid trailing zeros before numbers
         if (rightSide.length === 1 && rightSide[0] === 0 && Number(valueType)) {
-            console.log("trtrtr");
             rightSide = [];
         }
         // Push values to rightSide variable
@@ -152,7 +152,10 @@ var registerInput = function (input) {
 // Delete function for backspace button
 var deleteFunc = function () {
     // Delete on the left side
-    if (!operator && !rightSide.length && leftSide.length) {
+    if (!operator && !rightSide.length) {
+        if (!leftSide.length) {
+            return;
+        }
         // If no numbers left, set zero else pop
         leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
         togglePointButton(leftSide);
@@ -203,10 +206,13 @@ var sum = function () {
 buttons.forEach((function (btn) { return (btn).addEventListener("click", function (e) { return registerInput(e.target.textContent); }); }));
 window.addEventListener("keydown", function (e) {
     if ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105)) {
-        registerInput(e.key.toString());
+        Number(e.key) || e.key === "0" ? registerInput(e.key.toString()) : null;
     }
     else if (e.key === "," || e.key === ".") {
-        registerInput(".");
+        if (!floatButton.disabled) {
+            registerInput(".");
+        }
+        ;
     }
     else if (e.key === "/" || e.key === "*" || e.key === "-" || e.key === "+") {
         registerInput(e.key);
