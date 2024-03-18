@@ -1,7 +1,6 @@
 let leftSide: any[] = [];
 let rightSide: any[] = [];
 let operator: string = null;
-let inputString: string = "0";
 const screenEl: HTMLElement = document.querySelector(".screen");
 const buttons = document.querySelectorAll("button");
 const floatButton: HTMLButtonElement = document.querySelector(".float");
@@ -31,6 +30,86 @@ const operate = function(operator: string, num1: number, num2: number): number {
 	}
 }
 
+// Register input
+const registerInput = function (input): void {
+	switch(input) {
+		case "C": reset(); 
+		break;
+		case "=": sum();
+		break;
+		case "<": deleteFunc();
+		break;
+		default: saveValue(input); 
+		break;
+	}
+}
+
+// Delete function for backspace button
+const deleteFunc = function(): void {
+	
+	// Delete on the left side
+	if(!operator && !rightSide.length){
+		
+		if(!leftSide.length) {
+			return;
+		}	
+
+		// If no numbers left, set zero else pop
+		leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
+		togglePointButton(leftSide);
+		updateScreen(leftSide.join("").toString());
+
+	// Delete from the right side
+	} else if (operator && rightSide.length){
+		rightSide.pop();
+		togglePointButton(rightSide);	
+		updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
+
+	// Delete operator
+	 } else {
+	 	operator = "";
+		updateScreen(leftSide.join("").toString());
+		togglePointButton(leftSide);	
+	 }
+}
+
+// Reset calculator
+const reset = function(): void {
+	leftSide = [];
+	rightSide = [];
+	operator = "";
+	floatButton.disabled = false;
+	updateScreen("0");
+}
+
+const updateScreen = function(value: any): void {
+	screenEl.textContent = value;
+}
+
+const togglePointButton = function(array: string[]): void {
+	array.filter(el => el === ".").length ? floatButton.disabled = true : floatButton.disabled = false;
+}
+
+// Do a calculation when pressing equals button
+const sum = function(): void {
+	
+	// If 0/0 - reset
+	if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
+		reset();
+		updateScreen("ERROR");	
+		return;
+	}
+	
+	// Calculate
+	if(leftSide.length && rightSide.length && operator) {
+		const totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
+		reset();
+		updateScreen(totalSum.toString());
+		leftSide = [...totalSum.toString().split("")];
+		togglePointButton(leftSide);
+	}
+}
+
 // Save entered value and do operations based on the calculators current status
 const saveValue = function(value: string): void {
 	
@@ -45,7 +124,7 @@ const saveValue = function(value: string): void {
 
 			// Check for 0/0
 			if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
-				clearValues();
+				reset();
 				updateScreen("ERROR");
 				return;
 			}
@@ -131,93 +210,6 @@ const saveValue = function(value: string): void {
 	}
 }
 
-// Reset calculator 	
-const clearValues = function(): void {
-	leftSide =[];
-	rightSide = [];
-	operator = "";
-	floatButton.disabled = false;
-	updateScreen("0");
-}
-
-// Register input
-const registerInput = function (input): void {
-	switch(input) {
-		case "C": clearValues(); 
-		break;
-		case "=": sum();
-		break;
-		case "<": deleteFunc();
-		break;
-		default: saveValue(input); 
-		break;
-	}
-}
-
-// Delete function for backspace button
-const deleteFunc = function(): void {
-	
-	// Delete on the left side
-	if(!operator && !rightSide.length){
-		
-		if(!leftSide.length) {
-			return;
-		}	
-
-		// If no numbers left, set zero else pop
-		leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
-		togglePointButton(leftSide);
-		updateScreen(leftSide.join("").toString());
-
-	// Delete from the right side
-	} else if (operator && rightSide.length){
-		rightSide.pop();
-		togglePointButton(rightSide);	
-		updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
-
-	// Delete operator
-	 } else {
-	 	operator = "";
-		updateScreen(leftSide.join("").toString());
-		togglePointButton(leftSide);	
-	 }
-}
-
-const reset = function(): void {
-	leftSide = [];
-	rightSide = [];
-	operator = "";
-	floatButton.disabled = false;
-}
-
-const updateScreen = function(value: any): void {
-	screenEl.textContent = value;
-}
-
-const togglePointButton = function(array: string[]): void {
-	array.filter(el => el === ".").length ? floatButton.disabled = true : floatButton.disabled = false;
-}
-
-// Do a calculation when pressing equals button
-const sum = function(): void {
-	
-	// If 0/0 - reset
-	if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
-		updateScreen("ERROR");
-		reset();
-		return;
-	}
-	
-	// Calculate
-	if(leftSide.length && rightSide.length && operator) {
-		const totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
-		updateScreen(totalSum.toString());
-		reset();
-		leftSide = [...totalSum.toString().split("")];
-		togglePointButton(leftSide);
-	}
-}
-
 buttons.forEach((btn => (btn).addEventListener("click", (e) => registerInput((e.target as HTMLElement).textContent) )));
 
 window.addEventListener("keydown", function(e){
@@ -232,6 +224,6 @@ window.addEventListener("keydown", function(e){
 	} else if (e.keyCode === 8) {
 		deleteFunc();
 	} else if (e.keyCode === 27) {
-		clearValues();
+		reset();
 	}		
 });

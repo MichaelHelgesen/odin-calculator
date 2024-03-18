@@ -10,7 +10,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var leftSide = [];
 var rightSide = [];
 var operator = null;
-var inputString = "0";
 var screenEl = document.querySelector(".screen");
 var buttons = document.querySelectorAll("button");
 var floatButton = document.querySelector(".float");
@@ -42,6 +41,79 @@ var operate = function (operator, num1, num2) {
             break;
     }
 };
+// Register input
+var registerInput = function (input) {
+    switch (input) {
+        case "C":
+            reset();
+            break;
+        case "=":
+            sum();
+            break;
+        case "<":
+            deleteFunc();
+            break;
+        default:
+            saveValue(input);
+            break;
+    }
+};
+// Delete function for backspace button
+var deleteFunc = function () {
+    // Delete on the left side
+    if (!operator && !rightSide.length) {
+        if (!leftSide.length) {
+            return;
+        }
+        // If no numbers left, set zero else pop
+        leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
+        togglePointButton(leftSide);
+        updateScreen(leftSide.join("").toString());
+        // Delete from the right side
+    }
+    else if (operator && rightSide.length) {
+        rightSide.pop();
+        togglePointButton(rightSide);
+        updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
+        // Delete operator
+    }
+    else {
+        operator = "";
+        updateScreen(leftSide.join("").toString());
+        togglePointButton(leftSide);
+    }
+};
+// Reset calculator
+var reset = function () {
+    leftSide = [];
+    rightSide = [];
+    operator = "";
+    floatButton.disabled = false;
+    updateScreen("0");
+};
+var updateScreen = function (value) {
+    screenEl.textContent = value;
+};
+var togglePointButton = function (array) {
+    array.filter(function (el) { return el === "."; }).length ? floatButton.disabled = true : floatButton.disabled = false;
+};
+// Do a calculation when pressing equals button
+var sum = function () {
+    // If 0/0 - reset
+    if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
+        reset();
+        updateScreen("ERROR");
+        return;
+    }
+    // Calculate
+    if (leftSide.length && rightSide.length && operator) {
+        var totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
+        reset();
+        updateScreen(totalSum.toString());
+        leftSide = __spreadArray([], totalSum.toString().split(""), true);
+        togglePointButton(leftSide);
+    }
+};
 // Save entered value and do operations based on the calculators current status
 var saveValue = function (value) {
     // Determine if the value is a number or a dot
@@ -52,7 +124,7 @@ var saveValue = function (value) {
         if (leftSide.length && rightSide.length) {
             // Check for 0/0
             if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
-                clearValues();
+                reset();
                 updateScreen("ERROR");
                 return;
             }
@@ -124,85 +196,6 @@ var saveValue = function (value) {
         updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
     }
 };
-// Reset calculator 	
-var clearValues = function () {
-    leftSide = [];
-    rightSide = [];
-    operator = "";
-    floatButton.disabled = false;
-    updateScreen("0");
-};
-// Register input
-var registerInput = function (input) {
-    switch (input) {
-        case "C":
-            clearValues();
-            break;
-        case "=":
-            sum();
-            break;
-        case "<":
-            deleteFunc();
-            break;
-        default:
-            saveValue(input);
-            break;
-    }
-};
-// Delete function for backspace button
-var deleteFunc = function () {
-    // Delete on the left side
-    if (!operator && !rightSide.length) {
-        if (!leftSide.length) {
-            return;
-        }
-        // If no numbers left, set zero else pop
-        leftSide.length === 1 ? leftSide = [0] : leftSide.pop();
-        togglePointButton(leftSide);
-        updateScreen(leftSide.join("").toString());
-        // Delete from the right side
-    }
-    else if (operator && rightSide.length) {
-        rightSide.pop();
-        togglePointButton(rightSide);
-        updateScreen(leftSide.join("").toString() + operator + rightSide.join("").toString());
-        // Delete operator
-    }
-    else {
-        operator = "";
-        updateScreen(leftSide.join("").toString());
-        togglePointButton(leftSide);
-    }
-};
-var reset = function () {
-    leftSide = [];
-    rightSide = [];
-    operator = "";
-    floatButton.disabled = false;
-};
-var updateScreen = function (value) {
-    screenEl.textContent = value;
-};
-var togglePointButton = function (array) {
-    array.filter(function (el) { return el === "."; }).length ? floatButton.disabled = true : floatButton.disabled = false;
-};
-// Do a calculation when pressing equals button
-var sum = function () {
-    // If 0/0 - reset
-    if (operator === "/" && leftSide.join("") === "0" && rightSide.join("") === "0") {
-        updateScreen("ERROR");
-        reset();
-        return;
-    }
-    // Calculate
-    if (leftSide.length && rightSide.length && operator) {
-        var totalSum = Math.round(operate(operator, Number(leftSide.join("")), Number(rightSide.join(""))) * 10) / 10;
-        updateScreen(totalSum.toString());
-        reset();
-        leftSide = __spreadArray([], totalSum.toString().split(""), true);
-        togglePointButton(leftSide);
-    }
-};
 buttons.forEach((function (btn) { return (btn).addEventListener("click", function (e) { return registerInput(e.target.textContent); }); }));
 window.addEventListener("keydown", function (e) {
     if ((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105)) {
@@ -224,6 +217,6 @@ window.addEventListener("keydown", function (e) {
         deleteFunc();
     }
     else if (e.keyCode === 27) {
-        clearValues();
+        reset();
     }
 });
